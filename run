@@ -21,6 +21,7 @@ startFrontend() {
     echo "Starting frontend..."
     cd frontend
     npm install
+    npm fund
     npm run dev
 }
 
@@ -29,6 +30,7 @@ startBackend() {
     cd backend
     dependencies
     npm install
+    npm fund
     npm run dev
 }
 

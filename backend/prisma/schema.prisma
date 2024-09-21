@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id              String        @id @default(uuid())
+  contact_no      String        @unique
+  email           String        @unique
+  password        String
+  first_name      String?
+  last_name       String?
+  address         String?
+  // ------------------
+  // --- Timestamps ---
+  // ------------------
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  deleted_at      DateTime?
+  // -----------------
+  // --- Relations ---
+  // -----------------
+  admin           admin?
+  staff_member    staff_member?
+  agent           agent?
+  customer        customer?
+  deleted_users   user[]        @relation("UserDeletedBy")
+  deleted_by_user user?         @relation("UserDeletedBy", fields: [deleted_by], references: [id])
+  deleted_by      String?       @map("deleted_by")
+  // ------------------
+  // --- Enum Field ---
+  // ------------------
+  roles           Role[]
+}
+
+model admin {
+  id         String   @id @default(uuid())
+  // ------------------
+  // --- Timestamps ---
+  // ------------------
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  // -----------------
+  // --- Relations ---
+  // -----------------
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String   @unique
+}
+
+model staff_member {
+  id         String   @id @default(uuid())
+  // ------------------
+  // --- Timestamps ---
+  // ------------------
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  // -----------------
+  // --- Relations ---
+  // -----------------
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String   @unique
+}
+
+model agent {
+  id         String   @id @default(uuid())
+  // ------------------
+  // --- Timestamps ---
+  // ------------------
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  // -----------------
+  // --- Relations ---
+  // -----------------
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String   @unique
+}
+
+model customer {
+  id         String   @id @default(uuid())
+  // ------------------
+  // --- Timestamps ---
+  // ------------------
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  // -----------------
+  // --- Relations ---
+  // -----------------
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String   @unique
+}
+
+enum Role {
+  ADMIN
+  STAFF_MEMBER
+  AGENT
+  CUSTOMER
+}
