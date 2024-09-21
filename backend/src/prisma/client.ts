@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import logger from '../utils/logger';
 
 class PrismaSingleton {
     private static instance: PrismaClient;
@@ -8,7 +9,7 @@ class PrismaSingleton {
     public static getInstance(): PrismaClient {
         if (!PrismaSingleton.instance) {
             PrismaSingleton.instance = new PrismaClient();
-            console.log('Prisma client initialized...');
+            logger.info('Prisma client initialized...');
         }
         return PrismaSingleton.instance;
     }

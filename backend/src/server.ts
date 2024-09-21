@@ -1,18 +1,19 @@
 // src/server.ts
-import { prisma } from './prisma/client';
 import app from './app';
 import { port } from './env';
+import { prisma } from './prisma/client';
+import logger from './utils/logger';
 
 const server = app.listen(port, () => {
-    console.log(`Server is running on port ${port}...`);
+    logger.info(`Server is running on port ${port}...`);
 });
 
 const shutdown = async (signal: string) => {
-    console.log(`Received signal ${signal}. Shutting down...`);
+    logger.info(`Received signal ${signal}. Shutting down...`);
 
     try {
         await prisma.$disconnect();
-        console.log('Prisma client disconnected...');
+        logger.info('Prisma client disconnected...');
     } catch (error) {
         console.error('Error disconnecting Prisma client', error);
     }
@@ -22,7 +23,7 @@ const shutdown = async (signal: string) => {
             console.error('Error shutting down server', err);
             process.exit(1);
         }
-        console.log('Server closed...');
+        logger.info('Server closed...');
         process.exit(0);
     });
 };
