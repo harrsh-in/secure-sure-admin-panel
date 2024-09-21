@@ -7,8 +7,7 @@ CREATE TABLE "user" (
     "contact_no" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "first_name" TEXT,
-    "last_name" TEXT,
+    "name" TEXT,
     "address" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -64,6 +63,18 @@ CREATE UNIQUE INDEX "user_contact_no_key" ON "user"("contact_no");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
+
+-- CreateIndex
+CREATE INDEX "email" ON "user"("email");
+
+-- CreateIndex
+CREATE INDEX "contact_no" ON "user"("contact_no");
+
+-- CreateIndex
+CREATE INDEX "name" ON "user"("name");
+
+-- CreateIndex
+CREATE INDEX "created_at" ON "user"("created_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "admin_user_id_key" ON "admin"("user_id");

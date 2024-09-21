@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { PrismaClient, Role } from '@prisma/client';
+import { hashString } from '../../src/utils';
 
 const adminSeeder = async (prisma: PrismaClient) => {
     try {
@@ -8,7 +9,7 @@ const adminSeeder = async (prisma: PrismaClient) => {
         await prisma.user.create({
             data: {
                 email: 'admin@securesure.in',
-                password: 'admin',
+                password: await hashString('admin'),
                 roles: [Role.ADMIN],
                 contact_no: faker.phone.number({
                     style: 'international',
@@ -22,7 +23,7 @@ const adminSeeder = async (prisma: PrismaClient) => {
         await prisma.user.create({
             data: {
                 email: 'jaina@securesure.in',
-                password: 'admin',
+                password: await hashString('admin'),
                 roles: [Role.ADMIN],
                 contact_no: faker.phone.number({
                     style: 'international',
