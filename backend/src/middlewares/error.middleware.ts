@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { nodeEnv } from '../env';
 
 const errorHandlerMiddleware = (
     e: any,
@@ -14,7 +15,7 @@ const errorHandlerMiddleware = (
     res.status(statusCode).json({
         status: 'error',
         message,
-        error: process.env.NODE_ENV === 'development' ? e : undefined,
+        error: nodeEnv === 'development' ? e : undefined,
     });
 };
 

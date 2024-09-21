@@ -15,4 +15,5 @@ const getEnv = (key: string, isOptional?: boolean): string => {
     return value;
 };
 
+export const nodeEnv = getEnv('NODE_ENV');
 export const port = +getEnv('PORT');
