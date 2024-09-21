@@ -14,8 +14,8 @@ const shutdown = async (signal: string) => {
     try {
         await prisma.$disconnect();
         logger.info('Prisma client disconnected...');
-    } catch (error) {
-        console.error('Error disconnecting Prisma client', error);
+    } catch (e) {
+        console.error('Error disconnecting Prisma client', e);
     }
 
     server.close((err) => {
