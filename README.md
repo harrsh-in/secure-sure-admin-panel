@@ -1,1 +1,1 @@
-# secure-sure-admin-panel
+# Secure Sure Admin Panel
