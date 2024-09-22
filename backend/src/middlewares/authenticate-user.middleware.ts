@@ -1,6 +1,7 @@
 import { Role } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { nodeEnv } from '../env';
 import HttpError from '../libs/HttpError';
 import { prisma } from '../prisma/client';
 import {
@@ -43,7 +44,7 @@ const authenticateUserMiddleware =
 
                         res.cookie('accessToken', newAccessToken, {
                             httpOnly: true,
-                            secure: process.env.NODE_ENV === 'production',
+                            secure: nodeEnv === 'production',
                             sameSite: 'strict',
                             maxAge: 1000 * 60 * 15,
                         });

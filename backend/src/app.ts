@@ -5,6 +5,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
+import { corsOrigin } from './env';
 import errorHandlerMiddleware from './middlewares/error.middleware';
 import successHandlerMiddleware from './middlewares/response.middleware';
 import router from './routes';
@@ -36,8 +37,8 @@ app.use(
 );
 
 const corsOptions = {
-    origin: '*',
-    optionsSuccessStatus: 200,
+    origin: corsOrigin,
+    credentials: true,
 };
 app.use(cors(corsOptions));
 

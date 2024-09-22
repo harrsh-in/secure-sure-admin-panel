@@ -1,11 +1,20 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider } from 'react-router-dom';
+import { isDevMode } from './env';
 import router from './router';
+
+const queryClient = new QueryClient();
 
 const App = () => {
     return (
-        <main>
-            <RouterProvider router={router} />
-        </main>
+        <QueryClientProvider client={queryClient}>
+            <main>
+                <RouterProvider router={router} />
+            </main>
+
+            {isDevMode ? <ReactQueryDevtools initialIsOpen={false} /> : null}
+        </QueryClientProvider>
     );
 };
 

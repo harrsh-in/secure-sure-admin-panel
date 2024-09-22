@@ -1,25 +1,38 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, Paper, TextField, Typography } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import PasswordHookFormInput from '../../../components/inputs/PasswordHookFormInput';
+import axiosClient from '../../../utils/axiosClient';
 import { loginSchema, LoginSchema } from './schema';
 import './style.scss';
 
 const Login = () => {
+    const navigate = useNavigate();
+
+    const { mutate, isPending } = useMutation({
+        mutationKey: ['adminLogin'],
+        mutationFn: loginApi,
+        onSuccess() {
+            navigate('/');
+        },
+    });
+
     const {
         register,
         handleSubmit,
-        formState: { errors, isValid },
+        formState: { errors },
     } = useForm<LoginSchema>({
         resolver: zodResolver(loginSchema),
     });
 
     const onSubmit = (data: LoginSchema) => {
-        console.log(data);
+        mutate(data);
     };
 
     return (
-        <Box className="login-container">
+        <Paper className="login-container" variant="outlined">
             <Typography component="h1" className="login-header">
                 Login
             </Typography>
@@ -33,31 +46,30 @@ const Login = () => {
                     onSubmit={handleSubmit(onSubmit)}
                 >
                     <TextField
-                        label="Username"
-                        {...register('username')}
-                        error={!!errors.username}
-                        helperText={errors.username?.message}
-                        variant="outlined"
+                        label="Email"
+                        {...register('email')}
+                        autoFocus
                         fullWidth
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                        variant="outlined"
+                        disabled={isPending}
                     />
 
-                    <TextField
-                        label="Password"
-                        type="password"
-                        {...register('password')}
-                        error={!!errors.password}
-                        helperText={errors.password?.message}
-                        variant="outlined"
-                        fullWidth
+                    <PasswordHookFormInput
+                        register={register}
+                        errors={errors}
+                        name="password"
+                        disabled={isPending}
                     />
 
                     <Button
                         type="submit"
-                        variant="contained"
-                        color="primary"
-                        disabled={!isValid}
+                        variant="outlined"
+                        disabled={isPending}
+                        color={Object.keys(errors).length ? 'error' : 'primary'}
                     >
-                        Login
+                        {isPending ? 'Loading...' : 'Login'}
                     </Button>
                 </Box>
 
@@ -68,8 +80,14 @@ const Login = () => {
                     </Typography>
                 </Box>
             </Box>
-        </Box>
+        </Paper>
     );
 };
 
 export default Login;
+
+const loginApi = async (data: LoginSchema) => {
+    return await axiosClient.post('/auth/login/admin', data, {
+        withCredentials: true,
+    });
+};

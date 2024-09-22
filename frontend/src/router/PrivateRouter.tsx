@@ -7,7 +7,9 @@ interface PrivateRouterProps {
 }
 
 const PrivateRouter: React.FC<PrivateRouterProps> = ({ children }) => {
-    const token = Cookies.get('authToken');
+    const token = Cookies.get('isUserAuthenticated');
+
+    console.log(Cookies.get('isUserAuthenticated'));
 
     if (!token) {
         return <Navigate to="/login" />;
