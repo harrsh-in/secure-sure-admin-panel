@@ -17,3 +17,5 @@ const getEnv = (key: string, isOptional?: boolean): string => {
 
 export const nodeEnv = getEnv('NODE_ENV');
 export const port = +getEnv('PORT');
+export const jwtSecret = getEnv('JWT_SECRET');
+export const refreshTokenSecret = getEnv('REFRESH_TOKEN_SECRET');

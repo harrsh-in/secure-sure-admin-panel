@@ -9,7 +9,7 @@ const validateRequestMiddleware = (schemas: {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!schemas.body && !schemas.params && !schemas.query) {
-                throw new Error('No schema provided for validation!!!');
+                throw new Error('No schema provided for validation.');
             }
 
             if (schemas.body) {

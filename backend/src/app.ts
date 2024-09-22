@@ -1,6 +1,7 @@
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { query } from 'express';
+import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
@@ -54,6 +55,7 @@ app.use(
 );
 app.use(helmet());
 app.use(compression());
+app.use(cookieParser());
 
 app.use(successHandlerMiddleware);
 app.use('/api/v1', router);

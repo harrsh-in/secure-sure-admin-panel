@@ -1,9 +1,14 @@
-import { NextFunction, Request, Response } from 'express';
-import { AdminLoginRequestBody } from './requests';
-import { prisma } from '../../prisma/client';
 import { Role } from '@prisma/client';
+import { NextFunction, Request, Response } from 'express';
 import HttpError from '../../libs/HttpError';
-import { compareString } from '../../utils';
+import { prisma } from '../../prisma/client';
+import { compareString, generateUniqueDeviceId } from '../../utils';
+import {
+    generateAccessToken,
+    generateRefreshToken,
+    storeRefreshToken,
+} from '../../utils/token';
+import { AdminLoginRequestBody } from './requests';
 
 const adminLoginController = async (
     req: Request,
@@ -21,21 +26,52 @@ const adminLoginController = async (
                 },
             },
         });
-        if (!admin) {
+        if (
+            !admin ||
+            !compareString({
+                string: password,
+                hash: admin.password,
+            })
+        ) {
             throw new HttpError(
                 'Incorrect credentials. Please verify your credentials and try again.'
             );
         }
 
-        const isPasswordValid = compareString({
-            string: password,
-            hash: admin.password,
+        const accessToken = generateAccessToken({
+            id: admin.id,
         });
-        if (!isPasswordValid) {
-            throw new HttpError(
-                'Incorrect credentials. Please verify your credentials and try again.'
-            );
-        }
+        const refreshToken = generateRefreshToken({
+            id: admin.id,
+        });
+        const deviceId = generateUniqueDeviceId();
+
+        await storeRefreshToken({
+            refreshToken,
+            deviceId,
+            userId: admin.id,
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+        });
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 15,
+        });
+
+        res.cookie('deviceId', deviceId, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+        });
 
         return res.success({});
     } catch (e) {

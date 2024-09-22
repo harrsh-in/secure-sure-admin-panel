@@ -7,9 +7,9 @@ const pingController = async (
     next: NextFunction
 ) => {
     try {
-        logger.info('The server is up and running!!!');
+        logger.info('The server is up and running...');
 
-        return res.success({}, 'The server is up and running!!!');
+        return res.success({}, 'The server is up and running...');
     } catch (e) {
         next(e);
     }

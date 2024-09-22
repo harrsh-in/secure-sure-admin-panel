@@ -8,17 +8,17 @@ datasource db {
 }
 
 model user {
-  id              String        @id @default(uuid())
-  contact_no      String        @unique
-  email           String        @unique
+  id              String          @id @default(uuid())
+  contact_no      String          @unique
+  email           String          @unique
   password        String
   name            String?
   address         String?
   // ------------------
   // --- Timestamps ---
   // ------------------
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @updatedAt
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
   deleted_at      DateTime?
   // -----------------
   // --- Relations ---
@@ -27,9 +27,10 @@ model user {
   staff_member    staff_member?
   agent           agent?
   customer        customer?
-  deleted_users   user[]        @relation("UserDeletedBy")
-  deleted_by_user user?         @relation("UserDeletedBy", fields: [deleted_by], references: [id])
-  deleted_by      String?       @map("deleted_by")
+  deleted_users   user[]          @relation("UserDeletedBy")
+  deleted_by_user user?           @relation("UserDeletedBy", fields: [deleted_by], references: [id])
+  deleted_by      String?         @map("deleted_by")
+  refresh_tokens  refresh_token[]
   // ------------------
   // --- Enum Field ---
   // ------------------
@@ -42,6 +43,30 @@ model user {
   @@index([contact_no], name: "contact_no")
   @@index([name], name: "name")
   @@index([created_at], name: "created_at")
+}
+
+model refresh_token {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  device_id  String   @unique
+  // ------------------
+  // --- Timestamps ---
+  // ------------------
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  expires_at DateTime
+  // -----------------
+  // --- Relations ---
+  // -----------------
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String
+
+  // ---------------
+  // --- Indexes ---
+  // ---------------
+  @@index([user_id], name: "user_id")
+  @@index([device_id], name: "device_id")
+  @@index([user_id, device_id], name: "user_id_device_id")
 }
 
 model admin {

@@ -19,6 +19,19 @@ CREATE TABLE "user" (
 );
 
 -- CreateTable
+CREATE TABLE "refresh_token" (
+    "id" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "device_id" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "expires_at" TIMESTAMP(3) NOT NULL,
+    "user_id" TEXT NOT NULL,
+
+    CONSTRAINT "refresh_token_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "admin" (
     "id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -77,6 +90,21 @@ CREATE INDEX "name" ON "user"("name");
 CREATE INDEX "created_at" ON "user"("created_at");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "refresh_token_token_key" ON "refresh_token"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "refresh_token_device_id_key" ON "refresh_token"("device_id");
+
+-- CreateIndex
+CREATE INDEX "user_id" ON "refresh_token"("user_id");
+
+-- CreateIndex
+CREATE INDEX "device_id" ON "refresh_token"("device_id");
+
+-- CreateIndex
+CREATE INDEX "user_id_device_id" ON "refresh_token"("user_id", "device_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "admin_user_id_key" ON "admin"("user_id");
 
 -- CreateIndex
@@ -90,6 +118,9 @@ CREATE UNIQUE INDEX "customer_user_id_key" ON "customer"("user_id");
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_deleted_by_fkey" FOREIGN KEY ("deleted_by") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "refresh_token" ADD CONSTRAINT "refresh_token_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "admin" ADD CONSTRAINT "admin_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
