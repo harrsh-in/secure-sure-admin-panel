@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import PrivateLayout from '../layout';
 import axiosClient from '../utils/axiosClient';
 
 interface PrivateRouterProps {
@@ -41,7 +42,7 @@ const PrivateRouter: React.FC<PrivateRouterProps> = ({ children }) => {
         return <Navigate to="/login" />;
     }
 
-    return children;
+    return <PrivateLayout>{children}</PrivateLayout>;
 };
 
 export default PrivateRouter;
