@@ -36,15 +36,15 @@ const saveLoginCookies = async (res: Response, id: string) => {
         maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: nodeEnv === 'production',
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 15,
-    });
-
     res.cookie('isUserAuthenticated', 'true', {
         httpOnly: false,
+        secure: nodeEnv === 'production',
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
+    res.cookie('accessToken', accessToken, {
+        httpOnly: true,
         secure: nodeEnv === 'production',
         sameSite: 'strict',
         maxAge: 1000 * 60 * 15,

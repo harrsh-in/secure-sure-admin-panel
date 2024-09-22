@@ -9,6 +9,7 @@ import {
     verifyAccessToken,
     verifyRefreshToken,
 } from '../utils/token';
+import { removeLoginCookies } from '../controllers/auth/handle-cookies';
 
 const authenticateUserMiddleware =
     (roles: Role[]) =>
@@ -16,7 +17,7 @@ const authenticateUserMiddleware =
         try {
             const accessToken = req.cookies.accessToken;
             if (!accessToken) {
-                throw new HttpError('Please login to continue.', 401);
+                return await handleRefreshTokenMiddleware(req, res, next);
             }
 
             let decodedAccessToken: string | JwtPayload = '';
@@ -24,36 +25,7 @@ const authenticateUserMiddleware =
                 decodedAccessToken = verifyAccessToken(accessToken);
             } catch (e) {
                 if (e instanceof jwt.TokenExpiredError) {
-                    const refreshToken = req.cookies.refreshToken;
-                    const deviceId = req.cookies.deviceId;
-                    if (!refreshToken || !deviceId) {
-                        throw new HttpError('Please login to continue.', 401);
-                    }
-
-                    try {
-                        const decodedRefreshToken = await verifyRefreshToken({
-                            refreshToken,
-                            deviceId,
-                            next,
-                        });
-                        const userId = (decodedRefreshToken as any).user_id;
-
-                        const newAccessToken = generateAccessToken({
-                            id: userId,
-                        });
-
-                        res.cookie('accessToken', newAccessToken, {
-                            httpOnly: true,
-                            secure: nodeEnv === 'production',
-                            sameSite: 'strict',
-                            maxAge: 1000 * 60 * 15,
-                        });
-
-                        req.userId = userId;
-                        return next();
-                    } catch (e) {
-                        return next(e);
-                    }
+                    return await handleRefreshTokenMiddleware(req, res, next);
                 } else {
                     return next(e);
                 }
@@ -101,3 +73,45 @@ declare global {
         }
     }
 }
+
+const handleRefreshTokenMiddleware = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        const deviceId = req.cookies.deviceId;
+        if (!refreshToken || !deviceId) {
+            throw new HttpError('Please login to continue.', 401);
+        }
+
+        try {
+            const decodedRefreshToken = await verifyRefreshToken({
+                refreshToken,
+                deviceId,
+                next,
+            });
+            const userId = (decodedRefreshToken as any).user_id;
+
+            const newAccessToken = generateAccessToken({
+                id: userId,
+            });
+
+            res.cookie('accessToken', newAccessToken, {
+                httpOnly: true,
+                secure: nodeEnv === 'production',
+                sameSite: 'strict',
+                maxAge: 1000 * 60 * 15,
+            });
+
+            req.userId = userId;
+            return next();
+        } catch (e) {
+            removeLoginCookies(res);
+            return next(e);
+        }
+    } catch (e) {
+        return next(e);
+    }
+};

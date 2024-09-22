@@ -13,7 +13,7 @@ const generateAccessToken = ({ id }: { id: string }) => {
         },
         jwtSecret,
         {
-            expiresIn: '30s',
+            expiresIn: '15m',
         }
     );
 };
