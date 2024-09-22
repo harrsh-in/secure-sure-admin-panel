@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const adminLoginRequestBody = z.object({
+export const adminStaffLoginRequestBody = z.object({
     email: z
         .string({
             message: 'Please enter a valid email address.',
@@ -12,4 +12,6 @@ export const adminLoginRequestBody = z.object({
         message: 'Please enter a password.',
     }),
 });
-export type AdminLoginRequestBody = z.infer<typeof adminLoginRequestBody>;
+export type AdminStaffLoginRequestBody = z.infer<
+    typeof adminStaffLoginRequestBody
+>;

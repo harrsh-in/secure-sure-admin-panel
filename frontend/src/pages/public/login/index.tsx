@@ -4,17 +4,25 @@ import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import PasswordHookFormInput from '../../../components/inputs/PasswordHookFormInput';
+import useAuth from '../../../hooks/useAuth';
+import { Role } from '../../../types/enum';
 import axiosClient from '../../../utils/axiosClient';
 import { loginSchema, LoginSchema } from './schema';
 import './style.scss';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { setUserDetails } = useAuth();
 
     const { mutate, isPending } = useMutation({
         mutationKey: ['adminLogin'],
         mutationFn: loginApi,
-        onSuccess() {
+        onSuccess(data) {
+            setUserDetails({
+                userDetails: {
+                    roles: data.role,
+                },
+            });
             navigate('/');
         },
     });
@@ -86,8 +94,6 @@ const Login = () => {
 
 export default Login;
 
-const loginApi = async (data: LoginSchema) => {
-    return await axiosClient.post('/auth/login/admin', data, {
-        withCredentials: true,
-    });
+const loginApi = async (data: LoginSchema): Promise<{ role: Role[] }> => {
+    return await axiosClient.post('/auth/login/admin-staff', data);
 };

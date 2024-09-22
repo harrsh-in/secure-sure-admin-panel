@@ -4,29 +4,34 @@ import HttpError from '../../libs/HttpError';
 import { prisma } from '../../prisma/client';
 import { compareString } from '../../utils';
 import { saveLoginCookies } from './handle-cookies';
-import { AdminLoginRequestBody } from './requests';
+import { AdminStaffLoginRequestBody } from './requests';
 
-const adminLoginController = async (
+const adminStaffLoginController = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     try {
-        const { email, password } = req.body as AdminLoginRequestBody;
+        const { email, password } = req.body as AdminStaffLoginRequestBody;
 
-        const admin = await prisma.user.findFirst({
+        const adminStaffUser = await prisma.user.findFirst({
             where: {
                 email,
                 roles: {
-                    has: Role.ADMIN,
+                    hasSome: [Role.ADMIN, Role.STAFF_MEMBER],
                 },
+            },
+            select: {
+                id: true,
+                password: true,
+                roles: true,
             },
         });
         if (
-            !admin ||
+            !adminStaffUser ||
             !compareString({
                 string: password,
-                hash: admin.password,
+                hash: adminStaffUser.password,
             })
         ) {
             throw new HttpError(
@@ -34,12 +39,14 @@ const adminLoginController = async (
             );
         }
 
-        await saveLoginCookies(res, admin.id);
+        await saveLoginCookies(res, adminStaffUser.id);
 
-        return res.success({});
+        return res.success({
+            role: adminStaffUser.roles,
+        });
     } catch (e) {
         next(e);
     }
 };
 
-export default adminLoginController;
+export default adminStaffLoginController;
